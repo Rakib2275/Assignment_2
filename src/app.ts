@@ -5,7 +5,7 @@ import express, {
 } from "express";
 import { userRoute } from "./modules/user/user.route";
 // import { profileRoute } from "./modules/profile/profile.route";
-import { authRoute } from "./modules/auth/auth.route";
+// import { authRoute } from "./modules/auth/auth.route";
 import fs from "fs"
 import logger from "./middleware/logger";
 import CookieParser from "cookie-parser"
@@ -35,7 +35,7 @@ app.get("/", (req: Request, res: Response) => {
 
 app.use('/api/auth',userRoute)
 // app.use('/api/issues',profileRoute)
-app.use('/api/auth',authRoute);
+// app.use('/api/auth',authRoute);
 app.use('/api/issues',issuesRoute)
 
 app.use(globalErrorHandler);
