@@ -9,6 +9,7 @@ const auth = (...roles: ROLES[]) => {
     try {
       const authHeader = req.headers.authorization;
 
+      // 1. Check header
       if (!authHeader) {
         return res.status(401).json({
           success: false,
@@ -16,50 +17,59 @@ const auth = (...roles: ROLES[]) => {
         });
       }
 
-      // ✅ Bearer token fix
+      // 2. Extract token
       const token = authHeader.startsWith("Bearer ")
         ? authHeader.split(" ")[1]
         : authHeader;
 
+      // 3. Verify token
       const decoded = jwt.verify(
         token as string,
         config.secret as string
       ) as JwtPayload;
 
+      // 4. Validate payload
+      if (!decoded?.id) {
+        return res.status(401).json({
+          success: false,
+          message: "Invalid token payload",
+        });
+      }
+
+      // 5. Get user from DB (IMPORTANT: using id not email)
       const userData = await pool.query(
-        `SELECT * FROM users WHERE email=$1`,
-        [decoded.email]
+        `SELECT id, name, email, role FROM users WHERE id=$1`,
+        [decoded.id]
       );
 
       if (userData.rows.length === 0) {
         return res.status(404).json({
           success: false,
-          message: "User not Found!",
+          message: "User not found!",
         });
       }
 
       const user = userData.rows[0];
 
-      if (!user.is_active) {
-        return res.status(403).json({
-          success: false,
-          message: "Forbidden!",
-        });
-      }
-
-      if (roles.length && !roles.includes(user.role)) {
+      // 6. Role based access control
+      if (roles.length > 0 && !roles.includes(user.role)) {
         return res.status(403).json({
           success: false,
           message: "Forbidden! No access",
         });
       }
 
-      // ✅ best practice: DB user set
+      // 7. Attach user to request
       req.user = user;
+
+      // console.log("AUTH USER:", req.user);
 
       next();
     } catch (error) {
-      next(error);
+      return res.status(403).json({
+        success: false,
+        message: "Forbidden!",
+      });
     }
   };
 };
