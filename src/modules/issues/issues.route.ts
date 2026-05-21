@@ -11,6 +11,7 @@ router.post(
 );
 router.get("/",issueController.getAllIssues);
 router.get("/:id",issueController.getSingleIssue);
-router.patch("/:id",auth(),issueController.updateIssue)
+router.patch("/:id",auth(),issueController.updateIssue);
+router.delete("/:id",issueController.deleteIssue)
 
 export const issuesRoute = router;
