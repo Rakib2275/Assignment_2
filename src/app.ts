@@ -34,8 +34,6 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 app.use('/api/auth',userRoute)
-// app.use('/api/issues',profileRoute)
-// app.use('/api/auth',authRoute);
 app.use('/api/issues',issuesRoute)
 
 app.use(globalErrorHandler);

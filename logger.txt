@@ -324,3 +324,29 @@ Method -> GET Time -> 1779379421416 - URL -> /api/auth/login
 Method -> POST Time -> 1779379454443 - URL -> /api/issues/
 
 Method -> GET Time -> 1779379464616 - URL -> /api/issues/
+
+Method -> GET Time -> 1779416939227 - URL -> /api/auth/login
+
+Method -> POST Time -> 1779416993576 - URL -> /api/issues/
+
+Method -> GET Time -> 1779417004182 - URL -> /api/issues/
+
+Method -> DELETE Time -> 1779417046385 - URL -> /api/issues/10
+
+Method -> DELETE Time -> 1779417053312 - URL -> /api/issues/7
+
+Method -> GET Time -> 1779417058245 - URL -> /api/issues/
+
+Method -> POST Time -> 1779417490120 - URL -> /api/issues/
+
+Method -> GET Time -> 1779418693827 - URL -> /
+
+Method -> GET Time -> 1779418694676 - URL -> /favicon.ico
+
+Method -> GET Time -> 1779418705750 - URL -> /api/users
+
+Method -> GET Time -> 1779418706015 - URL -> /api/users
+
+Method -> GET Time -> 1779418728009 - URL -> /api/auth
+
+Method -> GET Time -> 1779418747182 - URL -> /api/issues

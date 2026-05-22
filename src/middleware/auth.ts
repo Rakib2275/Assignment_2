@@ -9,7 +9,6 @@ const auth = (...roles: ROLES[]) => {
     try {
       const authHeader = req.headers.authorization;
 
-      // 1. Check header
       if (!authHeader) {
         return res.status(401).json({
           success: false,
@@ -17,18 +16,15 @@ const auth = (...roles: ROLES[]) => {
         });
       }
 
-      // 2. Extract token
       const token = authHeader.startsWith("Bearer ")
         ? authHeader.split(" ")[1]
         : authHeader;
 
-      // 3. Verify token
       const decoded = jwt.verify(
         token as string,
         config.secret as string
       ) as JwtPayload;
 
-      // 4. Validate payload
       if (!decoded?.id) {
         return res.status(401).json({
           success: false,
@@ -36,7 +32,6 @@ const auth = (...roles: ROLES[]) => {
         });
       }
 
-      // 5. Get user from DB (IMPORTANT: using id not email)
       const userData = await pool.query(
         `SELECT id, name, email, role FROM users WHERE id=$1`,
         [decoded.id]
@@ -51,7 +46,6 @@ const auth = (...roles: ROLES[]) => {
 
       const user = userData.rows[0];
 
-      // 6. Role based access control
       if (roles.length > 0 && !roles.includes(user.role)) {
         return res.status(403).json({
           success: false,
@@ -59,7 +53,6 @@ const auth = (...roles: ROLES[]) => {
         });
       }
 
-      // 7. Attach user to request
       req.user = user;
 
       // console.log("AUTH USER:", req.user);
