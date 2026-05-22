@@ -26,7 +26,6 @@ app.use(logger)
 
 
 app.get("/", (req: Request, res: Response) => {
-  // res.send("Hello Bangladesh")
   res.status(200).json({
     message: "Express Server",
     author: "Next Level",

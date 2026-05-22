@@ -38,7 +38,6 @@ const getAllIssuesIntoDB = async (query: any) => {
     status,
   } = query;
 
-  // dynamic conditions
   const conditions: string[] = [];
   const values: any[] = [];
 
@@ -57,31 +56,26 @@ const getAllIssuesIntoDB = async (query: any) => {
     FROM issues
   `;
 
-  // WHERE
   if (conditions.length > 0) {
     sql += ` WHERE ${conditions.join(" AND ")}`;
   }
 
-  // SORT
   if (sort === "oldest") {
     sql += ` ORDER BY created_at ASC`;
   } else {
     sql += ` ORDER BY created_at DESC`;
   }
 
-  // get issues
   const issuesResult = await pool.query(sql, values);
 
   const issues = issuesResult.rows;
 
-  // collect reporter ids
   const reporterIds = [
     ...new Set(issues.map((issue) => issue.reporter_id)),
   ];
 
   let reportersMap: any = {};
 
-  // batch fetch reporters
   if (reporterIds.length > 0) {
     const reportersResult = await pool.query(
       `
@@ -101,7 +95,6 @@ const getAllIssuesIntoDB = async (query: any) => {
     );
   }
 
-  // final response
   const finalData = issues.map((issue) => ({
     id: issue.id,
     title: issue.title,
@@ -118,7 +111,6 @@ const getAllIssuesIntoDB = async (query: any) => {
 
 const getSingleIssueIntoDB = async (id: number) => {
 
-  // get issue
   const issueResult = await pool.query(
     `
     SELECT *
@@ -128,14 +120,12 @@ const getSingleIssueIntoDB = async (id: number) => {
     [id]
   );
 
-  // issue not found
   if (issueResult.rows.length === 0) {
     throw new Error("Issue not found");
   }
 
   const issue = issueResult.rows[0];
 
-  // get reporter
   const reporterResult = await pool.query(
     `
     SELECT id, name, role
@@ -147,7 +137,6 @@ const getSingleIssueIntoDB = async (id: number) => {
 
   const reporter = reporterResult.rows[0];
 
-  // final response
   const finalData = {
     id: issue.id,
     title: issue.title,
@@ -170,7 +159,6 @@ const updateIssueIntoDB = async (
 
   const { title, description, type } = payload;
 
-  // find issue
   const issueResult = await pool.query(
     `
     SELECT * FROM issues
@@ -185,22 +173,14 @@ const updateIssueIntoDB = async (
 
   const issue = issueResult.rows[0];
 
-  /**
-   * Access Rules
-   * Maintainer -> can update any issue
-   * Contributor -> only own issue + status must be open
-   */
-
   if (user.role === "contributor") {
 
-    // own issue check
     if (issue.reporter_id !== user.id) {
       throw new Error(
         "You are not authorized to update this issue"
       );
     }
 
-    // status check
     if (issue.status !== "open") {
       throw new Error(
         "You can only update open issues"
@@ -208,7 +188,6 @@ const updateIssueIntoDB = async (
     }
   }
 
-  // dynamic update
   const updates: string[] = [];
   const values: any[] = [];
 
@@ -227,15 +206,12 @@ const updateIssueIntoDB = async (
     updates.push(`type = $${values.length}`);
   }
 
-  // updated_at
   updates.push(`updated_at = NOW()`);
 
-  // no data provided
   if (values.length === 0) {
     throw new Error("No data provided for update");
   }
 
-  // add issue id
   values.push(id);
 
   const query = `
@@ -252,7 +228,6 @@ const updateIssueIntoDB = async (
 
 const deleteIssueIntoDB = async (id: number) => {
 
-  // check issue exists
   const issueResult = await pool.query(
     `SELECT * FROM issues WHERE id=$1`,
     [id]
@@ -262,7 +237,6 @@ const deleteIssueIntoDB = async (id: number) => {
     throw new Error("Issue not found");
   }
 
-  // delete issue
   await pool.query(
     `DELETE FROM issues WHERE id=$1`,
     [id]
